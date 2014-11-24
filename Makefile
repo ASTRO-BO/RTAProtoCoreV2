@@ -91,7 +91,7 @@ ifneq (, $(findstring zmq, $(LINKERENV)))
 LIBS += -lzmq
 endif
 ifneq (, $(findstring ctarta, $(LINKERENV)))
-	LIBS += -L$(CTARTA)/lib -lpacket -lcfitsio -lCTAconfig
+	LIBS += -L$(CTARTA)/lib -lpacket -lcfitsio -lCTAConfig
 endif
 ifneq (, $(findstring root, $(LINKERENV)))
 	ROOTCFLAGS   := $(shell root-config --cflags)
