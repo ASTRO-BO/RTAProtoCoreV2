@@ -29,6 +29,7 @@ LINKERENV= zmq, ctarta
 EXE_NAME1 = rtaebsim
 EXE_NAME2 = rtareceiver
 EXE_NAME3 = controller
+EXE_NAME4 = rtareceiver_zmq
 LIB_NAME =
 VER_FILE_NAME = version.h
 #the name of the directory where the conf file are copied (into $(datadir))
@@ -82,7 +83,7 @@ LIBS = -lstdc++
 CXXFLAGS   ?= -O3
 CFLAGS ?= -O3
 #Insert the implicit parameter to the compiler:
-ALL_CFLAGS = -m64 -fexceptions -Wall  $(INCPATH)
+ALL_CFLAGS = -std=c++11 -m64 -fexceptions -Wall  $(INCPATH)
 
 ifneq (, $(findstring cfitsio, $(LINKERENV)))
 	LIBS += -lcfitsio
@@ -197,6 +198,7 @@ exe: makeobjdir $(OBJECTS)
 		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LIBS)
 		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LIBS)
 		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LIBS)
+		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LIBS) -lCTAToolsCore -lprotobuf -lzmq -lRTAUtils
 
 staticlib: makelibdir makeobjdir $(OBJECTS)	
 		test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)	
@@ -230,6 +232,7 @@ clean:
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME1)	
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME2)
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME3)
+	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME4)
 	$(DEL_FILE) version
 	$(DEL_FILE) prefix
 	$(DEL_FILE) $(PROJECT).dvi
@@ -265,6 +268,7 @@ install: all
 	test -d $(bindir) || mkdir -p $(bindir)	
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME1) $(bindir)
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME2) $(bindir)
+	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME4) $(bindir)
 	
 	#copy icon
 	#test -d $(icondir) || mkdir -p $(icondir)
@@ -287,6 +291,8 @@ uninstall:
 	
 	# For exe uninstall
 	$(DEL_FILE) $(bindir)/$(EXE_NAME)
+	$(DEL_FILE) $(bindir)/$(EXE_NAME2)
+	$(DEL_FILE) $(bindir)/$(EXE_NAME4)
 	#$(DEL_FILE) $(icondir)/$(ICON_NAME)
 	
 #dist: create a distribution tar file for this program
