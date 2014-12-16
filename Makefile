@@ -70,62 +70,31 @@ ICON_DIR = ui
 ####### 4) Compiler, tools and options
 
 ifneq (, $(findstring mpi, $(LINKERENV)))
-CXX       = mpic++
+CXX ?= mpic++
 else
-CXX      = g++
+CXX ?= g++
 endif
-CC = gcc
+CC ?= gcc
 
 #Set INCPATH to add the inclusion paths
 INCPATH = -I $(INCLUDE_DIR) -I $(CTARTA)/include
-LIBS = -lstdc++
 #Insert the optional parameter to the compiler. The CFLAGS could be changed externally by the user
 CXXFLAGS   ?= -O3
 CFLAGS ?= -O3
 #Insert the implicit parameter to the compiler:
-ALL_CFLAGS = -std=c++11 -m64 -fexceptions -Wall  $(INCPATH)
-
-ifneq (, $(findstring cfitsio, $(LINKERENV)))
-	LIBS += -lcfitsio
-endif
-ifneq (, $(findstring zmq, $(LINKERENV)))
-LIBS += -lzmq
-endif
-ifneq (, $(findstring ctarta, $(LINKERENV)))
-	LIBS += -L$(CTARTA)/lib -lpacket -lcfitsio -lCTAConfig
-endif
-ifneq (, $(findstring root, $(LINKERENV)))
-	ROOTCFLAGS   := $(shell root-config --cflags)
-	ROOTLIBS     := $(shell root-config --libs)
-	ROOTGLIBS    := $(shell root-config --glibs)
-	ROOTCONF=-O -pipe -Wall -W -fPIC -D_REENTRANT $(ROOTCFLAGS)
-	LIBS += $(ROOTGLIBS) -lMinuit
-	ALL_CFLAGS += $(ROOTCONF)
-endif
+ALL_CFLAGS = -Wall -std=c++11 $(INCPATH)
 
 #Set addition parameters that depends by operating system
-
-ifneq (, $(findstring linux, $(SYSTEM)))
- 	#Do linux things
-	ifneq (, $(findstring ice, $(LINKERENV)))
-		LIBS += -lIce -lIceUtil -lFreeze
-	endif
-endif
 ifneq (, $(findstring qnx, $(SYSTEM)))
     # Do qnx things
 	ALL_CFLAGS += -Vgcc_ntox86_gpp -lang-c++
 	LIBS += -lsocket
 endif
-ifneq (, $(findstring apple, $(SYSTEM)))
- 	# Do apple things
-	ifneq (, $(findstring ice, $(LINKERENV)))
-		LIBS += -lZerocIce -lZerocIceUtil -lFreeze
-	endif
-endif 
 
-LINK     = $(CXX)
+LINK     ?= $(CXX)
 #for link
 LFLAGS = -shared -Wl,-soname,$(TARGET1) -Wl,-rpath,$(DESTDIR)
+LEFLAGS  = -lstdc++ -L$(CTARTA)/lib
 AR       = ar cqs
 TAR      = tar -cf
 GZIP     = gzip -9f
@@ -195,10 +164,10 @@ lib: staticlib
 	
 exe: makeobjdir $(OBJECTS)
 		test -d $(EXE_DESTDIR) || mkdir -p $(EXE_DESTDIR)
-		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LIBS)
-		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LIBS)
-		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LIBS)
-		$(CXX) $(CXXFLAGS) $(ALL_CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LIBS) -lCTAToolsCore -lprotobuf -lzmq -lRTAUtils
+		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LEFLAGS) -lzmq -lcfitsio -lpacket
+		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LEFLAGS) -lzmq -lpacket
+		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LEFLAGS) -lzmq -lcfitsio
+		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lRTAUtils
 
 staticlib: makelibdir makeobjdir $(OBJECTS)	
 		test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)	
