@@ -29,7 +29,7 @@ LINKERENV= zmq, ctarta
 EXE_NAME1 = rtaebsim
 EXE_NAME2 = rtareceiver
 EXE_NAME3 = controller
-EXE_NAME4 = rtareceiver_zmq
+#EXE_NAME4 = rtareceiver_zmq
 LIB_NAME =
 VER_FILE_NAME = version.h
 #the name of the directory where the conf file are copied (into $(datadir))
@@ -77,7 +77,7 @@ endif
 CC ?= gcc
 
 #Set INCPATH to add the inclusion paths
-INCPATH = -I $(INCLUDE_DIR) -I $(CTARTA)/include
+INCPATH = -I $(INCLUDE_DIR)
 #Insert the optional parameter to the compiler. The CFLAGS could be changed externally by the user
 CXXFLAGS   ?= -O3
 CFLAGS ?= -O3
@@ -94,7 +94,7 @@ endif
 LINK     ?= $(CXX)
 #for link
 LFLAGS = -shared -Wl,-soname,$(TARGET1) -Wl,-rpath,$(DESTDIR)
-LEFLAGS  = -lstdc++ -L$(CTARTA)/lib
+LEFLAGS  = -lstdc++
 AR       = ar cqs
 TAR      = tar -cf
 GZIP     = gzip -9f
@@ -116,8 +116,9 @@ vpath %.o $(OBJECTS_DIR)
 ####### 6) Files of the project
 	
 INCLUDE=$(foreach dir,$(INCLUDE_DIR), $(wildcard $(dir)/*.h))
-SOURCE=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.cpp))
-SOURCE+=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.c))
+SOURCE2=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.cpp))
+SOURCE2+=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.c))
+SOURCE:=$(filter-out $(SOURCE_DIR)/rtareceiver_zmq.cpp,$(SOURCE2))
 #Objects to build
 OBJECTS=$(addsuffix .o, $(basename $(notdir $(SOURCE))))
 #only for documentation generation
@@ -167,7 +168,7 @@ exe: makeobjdir $(OBJECTS)
 		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LEFLAGS) -lzmq -lcfitsio -lpacket
 		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LEFLAGS) -lzmq -lpacket
 		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LEFLAGS) -lzmq -lcfitsio
-		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lRTAUtils
+#		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lRTAUtils
 
 staticlib: makelibdir makeobjdir $(OBJECTS)	
 		test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)	
@@ -201,7 +202,7 @@ clean:
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME1)	
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME2)
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME3)
-	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME4)
+#	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME4)
 	$(DEL_FILE) version
 	$(DEL_FILE) prefix
 	$(DEL_FILE) $(PROJECT).dvi
@@ -237,7 +238,7 @@ install: all
 	test -d $(bindir) || mkdir -p $(bindir)	
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME1) $(bindir)
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME2) $(bindir)
-	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME4) $(bindir)
+#	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME4) $(bindir)
 	
 	#copy icon
 	#test -d $(icondir) || mkdir -p $(icondir)
@@ -261,7 +262,7 @@ uninstall:
 	# For exe uninstall
 	$(DEL_FILE) $(bindir)/$(EXE_NAME)
 	$(DEL_FILE) $(bindir)/$(EXE_NAME2)
-	$(DEL_FILE) $(bindir)/$(EXE_NAME4)
+#	$(DEL_FILE) $(bindir)/$(EXE_NAME4)
 	#$(DEL_FILE) $(icondir)/$(ICON_NAME)
 	
 #dist: create a distribution tar file for this program
