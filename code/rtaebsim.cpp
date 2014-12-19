@@ -71,19 +71,19 @@ int main (int argc, char *argv [])
 	
 	cout << "Start EB Sim" << endl;
 	// check arguments
-	if(argc < 2 || argc > 3)
+	if(argc < 3)
 	{
 		std::cerr << "Error: wrong number of arguments. Usage:" << std::endl;
-		std::cerr << "./rtaebsim file.raw [delay (usec)]" << std::endl;
+		std::cerr << argv[0] << " conf.xml file.raw [delay (usec)]" << std::endl;
 		return EXIT_FAILURE;
 	}
 	
 	double usecs = 0;
 	if(argc == 3)
-		usecs = std::atof(argv[2]);
+		usecs = std::atof(argv[3]);
 	
 	
-	connect_to = "tcp://127.0.0.1:5555";
+	connect_to = "tcp://localhost:5555";
 	//connect_to = "ipc:///tmp/feeds/0";
 	message_size = 128000;
 	message_count = 0;
@@ -120,7 +120,7 @@ int main (int argc, char *argv [])
 	PacketLib::PacketBufferV* buff;
 	try
 	{
-		buff = new PacketLib::PacketBufferV("./conf/rta_fadc_all.xml", argv[1]);
+		buff = new PacketLib::PacketBufferV(argv[1], argv[2]);
 		buff->load();
 		std::cout << "Loaded buffer of " << buff->size() << " packets." << std::endl;
 		

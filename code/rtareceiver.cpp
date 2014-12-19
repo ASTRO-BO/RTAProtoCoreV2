@@ -27,12 +27,13 @@ int main (int argc, char *argv [])
 	unsigned long throughput;
 	double megabits;
 	unsigned long int totbytes = 0;
-	/*
-	if (argc != 4) {
-		printf ("usage: local_thr <bind-to> <message-size> <message-count>\n");
-		return 1;
+
+	if(argc < 2)
+	{
+		std::cerr << "Error: wrong number of arguments. Usage:" << std::endl;
+		std::cerr << argv[0] << " conf.xml" << std::endl;
+		return EXIT_FAILURE;
 	}
-	 */
 	
 	int npix_idx = 0;
 	int nsamp_idx = 0;
@@ -40,7 +41,7 @@ int main (int argc, char *argv [])
 	PacketStream* ps;
 	
 	try {
-		ps = new PacketStream("./conf/rta_fadc_all.xml");
+		ps = new PacketStream(argv[1]);
 		Packet *p = ps->getPacketType("triggered_telescope1_30GEN");
 		npix_idx = p->getPacketSourceDataField()->getFieldIndex("Number of pixels");
 		nsamp_idx = p->getPacketSourceDataField()->getFieldIndex("Number of samples");
@@ -53,7 +54,8 @@ int main (int argc, char *argv [])
 	
 
 	
-	bind_to = "tcp://lo0:5555";
+	bind_to = "tcp://*:5555";
+	std::cout << "bind to " << bind_to << std::endl;
 	//bind_to = "ipc:///tmp/feeds/0";
 	
 	message_count = 0;
