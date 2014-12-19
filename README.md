@@ -1,4 +1,1 @@
-BaseProject
-===========
-
-Base project for C++
+The core executables of the second RTA prototype for the CTA observatory.
