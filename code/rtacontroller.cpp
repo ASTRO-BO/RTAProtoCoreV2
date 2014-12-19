@@ -1,3 +1,17 @@
+/***************************************************************************
+ rtacontroller.cpp
+ -------------------
+ copyright            : (C) 2014 Andrea Bulgarelli
+ email                : bulgarelli@iasfbo.inaf.it
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software for non commercial purpose              *
+ *   modify it under the terms of the GNU General Public License.          *
+ *   For commercial purpose see appropriate license terms                  *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "zhelpers.h"
 #include <stdlib.h>

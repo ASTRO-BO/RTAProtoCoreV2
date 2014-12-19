@@ -1,3 +1,18 @@
+/***************************************************************************
+ Receiver from DAQStreamer (integration test)
+ -------------------
+ copyright            : (C) 2014 Andrea Zoli, Andrea Bulgarelli
+ email                : zoli@iasfbo.inaf.it, bulgarelli@iasfbo.inaf.it
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software for non commercial purpose              *
+ *   modify it under the terms of the GNU General Public License.          *
+ *   For commercial purpose see appropriate license terms                  *
+ *                                                                         *
+ ***************************************************************************/
+
 #include <Streamer.hpp>     // CTATools streamer
 #include <L0.pb.h>          // CTATools L0 data model
 #include <zmq.hpp>
