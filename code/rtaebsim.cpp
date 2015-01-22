@@ -23,7 +23,7 @@
 #include <iomanip>
 
 #include <ctime>
-#include "mac_clock_gettime.h"
+#include <ctautils/mac_clock_gettime.h>
 
 #include <packet/PacketBufferV.h>
 
@@ -73,12 +73,12 @@ void freeBuff (void *data, void *hint)
 int main (int argc, char *argv [])
 {
 	const char *connect_to;
-	int message_count;
-	int message_size;
+	//int message_count;
+	//int message_size;
 	void *context;
 	void *sender;
 	int rc;
-	int i;
+	//int i;
 	zmq_msg_t msg;
 	void *watch;
 	unsigned long elapsed;
@@ -99,8 +99,8 @@ int main (int argc, char *argv [])
 	
 	connect_to = "tcp://localhost:5555";
 	//connect_to = "ipc:///tmp/feeds/0";
-	message_size = 128000;
-	message_count = 0;
+	//message_size = 128000;
+	//message_count = 0;
 	
 	context = zmq_init (1);
 	if (!context) {
@@ -123,15 +123,13 @@ int main (int argc, char *argv [])
 	}
 	
 	//  Socket for control input
-	/*
-	void *controller = zmq_socket (context, ZMQ_SUB);
-	zmq_connect (controller, "tcp://*:5500");
-	zmq_setsockopt (controller, ZMQ_SUBSCRIBE, "", 0);
-	*/
+	//void *controller = zmq_socket (context, ZMQ_SUB);
+	//zmq_connect (controller, "tcp://*:5500");
+	//zmq_setsockopt (controller, ZMQ_SUBSCRIBE, "", 0);
 	
 	cout << "start" << endl;
 	// load the raw file.
-	PacketLib::PacketBufferV* buff;
+	PacketLib::PacketBufferV* buff = NULL;
 	try
 	{
 		buff = new PacketLib::PacketBufferV(argv[1], argv[2]);
@@ -150,7 +148,7 @@ int main (int argc, char *argv [])
 	
 	clock_gettime( CLOCK_MONOTONIC, &start);
 	size_t byteSent = 0;
-	size_t buffsize = 128000;
+	//size_t buffsize = 128000;
 	
 	watch = zmq_stopwatch_start ();
 	while (true) {

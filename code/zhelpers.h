@@ -43,7 +43,7 @@
 //  Receive 0MQ string from socket and convert into C string
 //  Caller must free returned string. Returns NULL if the context
 //  is being terminated.
-static char *
+char *
 s_recv (void *socket) {
     char buffer [256];
     int size = zmq_recv (socket, buffer, 255, 0);
@@ -56,14 +56,14 @@ s_recv (void *socket) {
 }
 
 //  Convert C string to 0MQ string and send to socket
-static int
+int
 s_send (void *socket, char *string) {
     int size = zmq_send (socket, string, strlen (string), 0);
     return size;
 }
 
 //  Sends string as 0MQ string, as multipart non-terminal
-static int
+int
 s_sendmore (void *socket, char *string) {
     int size = zmq_send (socket, string, strlen (string), ZMQ_SNDMORE);
     return size;
@@ -71,7 +71,7 @@ s_sendmore (void *socket, char *string) {
 
 //  Receives all message parts from socket, prints neatly
 //
-static void
+void
 s_dump (void *socket)
 {
     puts ("----------------------------------------");
@@ -111,7 +111,7 @@ s_dump (void *socket)
 
 //  Set simple random printable identity on socket
 //
-static void
+void
 s_set_id (void *socket)
 {
     char identity [10];
@@ -121,7 +121,7 @@ s_set_id (void *socket)
 
 
 //  Sleep for a number of milliseconds
-static void
+void
 s_sleep (int msecs)
 {
 #if (defined (WIN32))
@@ -135,7 +135,7 @@ s_sleep (int msecs)
 }
 
 //  Return current system clock as milliseconds
-static int64_t
+int64_t
 s_clock (void)
 {
 #if (defined (WIN32))
@@ -152,7 +152,7 @@ s_clock (void)
 //  Print formatted string to stdout, prefixed by date/time and
 //  terminated with a newline.
 
-static void
+void
 s_console (const char *format, ...)
 {
     time_t curtime = time (NULL);

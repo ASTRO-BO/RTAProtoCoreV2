@@ -13,11 +13,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "zhelpers.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <iostream>
+#include "zhelpers.h"
 
 using namespace std;
 
@@ -25,12 +25,12 @@ int main (int argc, char *argv [])
 {
 	const char *connect_to;
 	char* message_string;
-	int message_size;
+	//int message_size;
 	void *context;
-	void *sender;
-	int rc;
-	int i;
-	zmq_msg_t msg;
+	//void *sender;
+	//int rc;
+	//int i;
+	//zmq_msg_t msg;
 	
 	
 	if (argc != 2) {

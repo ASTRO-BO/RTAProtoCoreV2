@@ -165,10 +165,10 @@ lib: staticlib
 	
 exe: makeobjdir $(OBJECTS)
 		test -d $(EXE_DESTDIR) || mkdir -p $(EXE_DESTDIR)
-		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LEFLAGS) -lzmq -lcfitsio -lpacket
+		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LEFLAGS) -lzmq -lcfitsio -lpacket -lCTAUtils
 		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LEFLAGS) -lzmq -lpacket
 		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LEFLAGS) -lzmq -lcfitsio
-#		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lRTAUtils
+#		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lCTAUtils
 
 staticlib: makelibdir makeobjdir $(OBJECTS)	
 		test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)	

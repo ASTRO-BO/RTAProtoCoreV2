@@ -35,7 +35,7 @@ int main (int argc, char *argv [])
 	void *context;
 	void *s;
 	int rc;
-	int i;
+	//int i;
 	zmq_msg_t msg;
 	void *watch;
 	unsigned long elapsed;
@@ -50,17 +50,13 @@ int main (int argc, char *argv [])
 		return EXIT_FAILURE;
 	}
 	
-	int npix_idx = 0;
-	int nsamp_idx = 0;
-	int telid_idx = 0;
-	PacketStream* ps;
-	
+	PacketStream* ps = NULL;
 	try {
 		ps = new PacketStream(argv[1]);
 		Packet *p = ps->getPacketType("triggered_telescope1_30GEN");
-		npix_idx = p->getPacketSourceDataField()->getFieldIndex("Number of pixels");
-		nsamp_idx = p->getPacketSourceDataField()->getFieldIndex("Number of samples");
-		telid_idx = p->getPacketDataFieldHeader()->getFieldIndex("TelescopeID");
+		p->getPacketSourceDataField()->getFieldIndex("Number of pixels");
+		p->getPacketSourceDataField()->getFieldIndex("Number of samples");
+		p->getPacketDataFieldHeader()->getFieldIndex("TelescopeID");
 	} catch (PacketException* e)
 	{
 		cout << "Error during extractWavePacket: ";
@@ -135,7 +131,7 @@ int main (int argc, char *argv [])
 			if(p->getPacketID() > 0) {
 				//int npix = p->getPacketSourceDataField()->getFieldValue(npix_idx);
 				//int nsamp = p->getPacketSourceDataField()->getFieldValue(nsamp_idx);
-				int telID = p->getPacketDataFieldHeader()->getFieldValue(telid_idx);
+				//int telID = p->getPacketDataFieldHeader()->getFieldValue(telid_idx);
 				
 				ByteStreamPtr data = p->getData();
 		#ifdef ARCH_BIGENDIAN
@@ -146,7 +142,7 @@ int main (int argc, char *argv [])
 					data->swapWord();
 		#endif
 				totbytes += data->size();
-				byte* rawdata = data->getStream();
+				//byte* rawdata = data->getStream();
 			}
 	#ifdef DEBUG
 			std::cout << "npixels " << npix << std::endl;
