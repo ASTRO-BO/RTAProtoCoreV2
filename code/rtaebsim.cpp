@@ -99,5 +99,7 @@ int main (int argc, char *argv [])
 		}
 	}
 
+	sleep(3); // get an ack instead of guessing waiting time..
+
 	return 0;
 }

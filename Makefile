@@ -30,6 +30,7 @@ EXE_NAME1 = rtaebsim
 EXE_NAME2 = rtareceiver
 EXE_NAME3 = controller
 #EXE_NAME4 = rtareceiver_zmq
+EXE_NAME5 = rtawave
 LIB_NAME =
 VER_FILE_NAME = version.h
 #the name of the directory where the conf file are copied (into $(datadir))
@@ -165,10 +166,11 @@ lib: staticlib
 	
 exe: makeobjdir $(OBJECTS)
 		test -d $(EXE_DESTDIR) || mkdir -p $(EXE_DESTDIR)
-		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LEFLAGS) -lzmq -lcfitsio -lpacket -lCTAUtils
-		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LEFLAGS) -lzmq -lpacket
-		$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LEFLAGS) -lzmq -lcfitsio
+		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LEFLAGS) -lzmq -lcfitsio -lpacket -lCTAUtils
+		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LEFLAGS) -lzmq -lpacket -lCTAConfig -lCTAUtils -lcfitsio
+		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LEFLAGS) -lzmq -lcfitsio
 		@#$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lCTAUtils
+		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME5) $(OBJECTS_DIR)/rtawave.o $(LEFLAGS) -lzmq -lpthread -lRTAAlgorithms -lCTAAlgorithms -lCTAConfig -lCTAUtils -lpacket -lcfitsio
 
 staticlib: makelibdir makeobjdir $(OBJECTS)	
 		test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)	
@@ -203,6 +205,7 @@ clean:
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME2)
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME3)
 	@#$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME4)
+	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME5)
 	$(DEL_FILE) version
 	$(DEL_FILE) prefix
 	$(DEL_FILE) $(PROJECT).dvi
@@ -239,6 +242,7 @@ install: all
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME1) $(bindir)
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME2) $(bindir)
 	@#$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME4) $(bindir)
+	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME5) $(bindir)
 	
 	@#copy icon
 	@#test -d $(icondir) || mkdir -p $(icondir)
@@ -264,6 +268,7 @@ uninstall:
 	$(DEL_FILE) $(bindir)/$(EXE_NAME2)
 	@#$(DEL_FILE) $(bindir)/$(EXE_NAME4)
 	@#$(DEL_FILE) $(icondir)/$(ICON_NAME)
+	$(DEL_FILE) $(bindir)/$(EXE_NAME5)
 	
 #dist: create a distribution tar file for this program
 dist: all
