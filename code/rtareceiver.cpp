@@ -46,6 +46,7 @@ int main (int argc, char *argv [])
 	sock.recv(&nummessages, sizeof(nummessages), 0);
 	cout << "Connected, receiving " << nummessages << " messages.." << endl;
 
+	
 	zmq::context_t context1;
 	zmq::socket_t sock1(context1, ZMQ_PUSH);
 	sock1.connect("tcp://localhost:6661");
@@ -66,7 +67,8 @@ int main (int argc, char *argv [])
 	cout << "Waiting the rtawave3 connection.." << endl;
 	sock3.send(&nummessages, sizeof(nummessages), 0);
 	cout << "Connected to rtawave3." << endl;
-
+	
+	
 	cout << "Routing started!" << endl;
 
 	unsigned long message_count = 0;
@@ -82,6 +84,7 @@ int main (int argc, char *argv [])
 		
 		size_t buffsize = message.size();
 
+	//try {
 		/// decoding packetlib packet
 		PacketLib::ByteStreamPtr stream = PacketLib::ByteStreamPtr(new PacketLib::ByteStream((PacketLib::byte*)message.data(), message.size(), false));
 		PacketLib::Packet *packet = ps.getPacket(stream);
@@ -124,10 +127,14 @@ int main (int argc, char *argv [])
 					std::cerr << "Warning: bad telescope type, skipping." << std::endl;
 				}
 			}
+		
 		}
 		else
 			std::cout << "some error decoding the packet" << std::endl;
 
+//	} catch(PacketException* e) {
+//		cout << e->geterror() << endl;
+//	}
 		message_count++;
 		print_counter++;
 		totbytes += buffsize;
@@ -150,10 +157,11 @@ int main (int argc, char *argv [])
 	}
 
 	char eof = EOF;
+	
 	sock1.send(&eof, sizeof(eof), 0);
 	sock2.send(&eof, sizeof(eof), 0);
 	sock3.send(&eof, sizeof(eof), 0);
-
+	
 	sleep(3); // get an ack instead of guessing waiting time..
 
 	return 0;

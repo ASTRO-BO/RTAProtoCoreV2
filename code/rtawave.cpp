@@ -37,20 +37,21 @@ int main (int argc, char *argv [])
 		return EXIT_FAILURE;
 	}
 
-	CTAConfig::CTAMDArray array_conf;
-	array_conf.loadConfig("AARPROD2", "PROD2_telconfig.fits.gz", "Aar.conf", "../share/ctaconfig/");
 
 	PacketLib::PacketStream ps(argv[1]);
 	PacketLib::Packet *p = ps.getPacketType("triggered_telescope1_30GEN");
 	int npix_idx = p->getPacketSourceDataField()->getFieldIndex("Number of pixels");
 	int nsamp_idx = p->getPacketSourceDataField()->getFieldIndex("Number of samples");
-	int telID_idx = p->getPacketSourceDataField()->getFieldIndex("TelescopeID");
-	int evtn_idx = p->getPacketSourceDataField()->getFieldIndex("eventNumber");
-	int ntelsevt_idx = p->getPacketSourceDataField()->getFieldIndex("numberOfTriggeredTelescopes");
+	int telID_idx = p->getPacketDataFieldHeader()->getFieldIndex("TelescopeID");
+	int evtn_idx = p->getPacketDataFieldHeader()->getFieldIndex("eventNumber");
+	int ntelsevt_idx = p->getPacketDataFieldHeader()->getFieldIndex("numberOfTriggeredTelescopes");
+
+	CTAConfig::CTAMDArray array_conf;
+	array_conf.loadConfig("AARPROD2", "PROD2_telconfig.fits.gz", "Aar.conf", "../share/ctaconfig/");
 
 	RTAWaveformExtractor waveextractor(0, 0, 0, 6);
 	RTACleaning cleaning(&array_conf, 0, 0, 10, 30);
-	
+
 	zmq::context_t context;
 	zmq::socket_t sock(context, ZMQ_PULL);
 	std::string address = std::string("tcp://*:") + argv[2];
@@ -79,8 +80,11 @@ int main (int argc, char *argv [])
 			break;
 		}
 
+		try {
 		// Conversion Packet to RTAData_Camera. TODO a RTAAlgorithms class to do the conversion..
 		PacketLib::ByteStreamPtr stream = PacketLib::ByteStreamPtr(new PacketLib::ByteStream((PacketLib::byte*)message.data(), message.size(), false));
+		PacketLib::Packet *p = ps.getPacket(stream);
+			
 		PacketLib::ByteStreamPtr data = p->getData();
 #ifdef ARCH_BIGENDIAN
 		if(!data->isBigendian())
@@ -93,17 +97,25 @@ int main (int argc, char *argv [])
 		cam->nbytes = data->size();
 		cam->data = new uint16_t[data->size()];
 		memcpy(cam->data, data->getStream(), data->size());
-		cam->npix = p->getPacketSourceDataField()->getFieldValue(npix_idx);
-		cam->nsamp = p->getPacketSourceDataField()->getFieldValue(nsamp_idx);
-		cam->telID = p->getPacketSourceDataField()->getFieldValue(telID_idx);
-		cam->evtID = p->getPacketSourceDataField()->getFieldValue(evtn_idx);
-		cam->ntelsEvt = p->getPacketSourceDataField()->getFieldValue(ntelsevt_idx);
+		//cam->npix = p->getPacketSourceDataField()->getFieldValue(npix_idx);
+		//cam->nsamp = p->getPacketSourceDataField()->getFieldValue(nsamp_idx);
+		cam->telID = p->getPacketDataFieldHeader()->getFieldValue(telID_idx);
+		cam->evtID = p->getPacketDataFieldHeader()->getFieldValue(evtn_idx);
+		cam->ntelsEvt = p->getPacketDataFieldHeader()->getFieldValue(ntelsevt_idx);
+		
+		CTAConfig::CTAMDTelescopeType* teltype = array_conf.getTelescope(cam->telID)->getTelescopeType();
+		int telTypeSim = teltype->getID();
+		//std::cout << "telType: " << telTypeSim << std::endl;
+		cam->npix = teltype->getCameraType()->getNpixels();
+		cam->nsamp = teltype->getCameraType()->getPixel(0)->getPixelType()->getNSamples();
 
 		// waveform extraction
 		RTAData_CameraExtracted* integrated = (RTAData_CameraExtracted*) waveextractor.process(cam);
 
 		// cleaning
 		cleaning.process(integrated);
+			
+		delete integrated;
 
 		message_count++;
 		print_counter++;
@@ -124,7 +136,16 @@ int main (int argc, char *argv [])
 			print_counter = 0;
 			watch = zmq_stopwatch_start();
 		}
-	}
+			
 
+		delete cam;
+
+			
+		} catch (PacketLib::PacketException* e)
+		{
+			cout << e->geterror() << endl;
+			
+		}
+	}
 	return 0;
 }
