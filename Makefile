@@ -24,12 +24,14 @@ SHELL = /bin/sh
 ####### 1) Project names and system
 
 SYSTEM= $(shell gcc -dumpmachine)
-#ice, ctarta, mpi, cfitsio, zmq
-LINKERENV= zmq, ctarta
+# ctatools
+LINKERENV ?= zmq, ctarta
 EXE_NAME1 = rtaebsim
 EXE_NAME2 = rtareceiver
 EXE_NAME3 = controller
-#EXE_NAME4 = rtareceiver_zmq
+ifneq (, $(findstring ctatools, $(LINKERENV)))
+EXE_NAME4 = rtareceiver_zmq
+endif
 EXE_NAME5 = rtawave
 LIB_NAME =
 VER_FILE_NAME = version.h
@@ -115,11 +117,13 @@ VPATH=$(SOURCE_DIR):$(INCLUDE_DIR):
 vpath %.o $(OBJECTS_DIR)
 
 ####### 6) Files of the project
-	
+
 INCLUDE=$(foreach dir,$(INCLUDE_DIR), $(wildcard $(dir)/*.h))
-SOURCE2=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.cpp))
-SOURCE2+=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.c))
-SOURCE:=$(filter-out $(SOURCE_DIR)/rtareceiver_zmq.cpp,$(SOURCE2))
+SOURCE=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.cpp))
+SOURCE+=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.c))
+ifeq (, $(findstring ctatools, $(LINKERENV)))
+SOURCE:=$(filter-out $(SOURCE_DIR)/rtareceiver_zmq.cpp,$(SOURCE))
+endif
 #Objects to build
 OBJECTS=$(addsuffix .o, $(basename $(notdir $(SOURCE))))
 #only for documentation generation
@@ -158,7 +162,7 @@ $(DOXY_SOURCE_DIR)/%.cpp : %.cpp
 ####### 10) Build rules
 
 #all: compile the entire program.
-all: exe
+all: exe $(EXE_DESTDIR)/$(EXE_NAME4)
 		@#only if conf directory is present:
 		@#$(SYMLINK) $(CONF_DIR) $(CONF_DEST_DIR)
 
@@ -169,8 +173,10 @@ exe: makeobjdir $(OBJECTS)
 		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME1) $(OBJECTS_DIR)/rtaebsim.o $(LEFLAGS) -lzmq -lcfitsio -lpacket -lCTAUtils
 		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME2) $(OBJECTS_DIR)/rtareceiver.o $(LEFLAGS) -lzmq -lpacket -lCTAConfig -lCTAUtils -lcfitsio
 		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LEFLAGS) -lzmq -lcfitsio
-		@#$(CXX) -o $(EXE_DESTDIR)/$(EXE_NAME4) $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lCTAUtils
 		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME5) $(OBJECTS_DIR)/rtawave.o $(LEFLAGS) -lzmq -lpthread -lRTAAlgorithms -lCTAAlgorithms -lCTAConfig -lCTAUtils -lpacket -lcfitsio
+
+$(EXE_DESTDIR)/$(EXE_NAME4): $(OBJECTS)
+		$(CXX) $(CFLAGS) -o  $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lCTAUtils
 
 staticlib: makelibdir makeobjdir $(OBJECTS)	
 		test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)	
@@ -204,7 +210,7 @@ clean:
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME1)	
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME2)
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME3)
-	@#$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME4)
+	if [ -f $(EXE_DESTDIR)/$(EXE_NAME4) ] ; then $(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME4); fi
 	$(DEL_FILE) $(EXE_DESTDIR)/$(EXE_NAME5)
 	$(DEL_FILE) version
 	$(DEL_FILE) prefix
@@ -241,7 +247,7 @@ install: all
 	test -d $(bindir) || mkdir -p $(bindir)	
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME1) $(bindir)
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME2) $(bindir)
-	@#$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME4) $(bindir)
+	if [ -e $(EXE_DESTDIR)/$(EXE_NAME4) ] ; then $(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME4) $(bindir); fi
 	$(COPY_FILE) $(EXE_DESTDIR)/$(EXE_NAME5) $(bindir)
 	
 	@#copy icon
