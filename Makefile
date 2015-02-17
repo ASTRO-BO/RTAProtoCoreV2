@@ -122,9 +122,9 @@ INCLUDE=$(foreach dir,$(INCLUDE_DIR), $(wildcard $(dir)/*.h))
 TMP=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.cpp))
 TMP+=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.c))
 ifeq (, $(findstring ctatools, $(LINKERENV)))
-SOURCE=$(filter-out $(SOURCE_DIR)/rtareceiver_zmq.cpp,$(TMP))
+SOURCE=rtaebsim.cpp rtacontroller.cpp rtareceiver.cpp rtawave.cpp      
 else
-SOURCE=$(TMP)
+SOURCE=rtaebsim.cpp rtareceiver_zmq.cpp rtacontroller.cpp rtareceiver.cpp rtawave.cpp      
 endif
 #Objects to build
 OBJECTS=$(addsuffix .o, $(basename $(notdir $(SOURCE))))
