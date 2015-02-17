@@ -119,10 +119,12 @@ vpath %.o $(OBJECTS_DIR)
 ####### 6) Files of the project
 
 INCLUDE=$(foreach dir,$(INCLUDE_DIR), $(wildcard $(dir)/*.h))
-SOURCE=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.cpp))
-SOURCE+=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.c))
+TMP=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.cpp))
+TMP+=$(foreach dir,$(SOURCE_DIR), $(wildcard $(dir)/*.c))
 ifeq (, $(findstring ctatools, $(LINKERENV)))
-SOURCE:=$(filter-out $(SOURCE_DIR)/rtareceiver_zmq.cpp,$(SOURCE))
+SOURCE=$(filter-out $(SOURCE_DIR)/rtareceiver_zmq.cpp,$(TMP))
+else
+SOURCE=$(TMP)
 endif
 #Objects to build
 OBJECTS=$(addsuffix .o, $(basename $(notdir $(SOURCE))))
