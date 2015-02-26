@@ -25,7 +25,7 @@ SHELL = /bin/sh
 
 SYSTEM= $(shell gcc -dumpmachine)
 # ctatools
-LINKERENV ?= zmq, ctarta
+LINKERENV ?= zmq, ctarta, ctatools
 EXE_NAME1 = rtaebsim
 EXE_NAME2 = rtareceiver
 EXE_NAME3 = controller
@@ -164,7 +164,11 @@ $(DOXY_SOURCE_DIR)/%.cpp : %.cpp
 ####### 10) Build rules
 
 #all: compile the entire program.
+ifneq (, $(findstring ctatools, $(LINKERENV)))
 all: exe $(EXE_DESTDIR)/$(EXE_NAME4)
+else
+all: exe
+endif
 		@#only if conf directory is present:
 		@#$(SYMLINK) $(CONF_DIR) $(CONF_DEST_DIR)
 
@@ -177,8 +181,10 @@ exe: makeobjdir $(OBJECTS)
 		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME3) $(OBJECTS_DIR)/rtacontroller.o $(LEFLAGS) -lzmq -lcfitsio
 		$(CXX) $(CFLAGS) -o $(EXE_DESTDIR)/$(EXE_NAME5) $(OBJECTS_DIR)/rtawave.o $(LEFLAGS) -lzmq -lpthread -lRTAAlgorithms -lCTAAlgorithms -lCTAConfig -lCTAUtils -lpacket -lcfitsio
 
+ifneq (, $(findstring ctatools, $(LINKERENV)))
 $(EXE_DESTDIR)/$(EXE_NAME4): $(OBJECTS)
 		$(CXX) $(CFLAGS) -o  $(OBJECTS_DIR)/rtareceiver_zmq.o $(LEFLAGS) -lzmq -lcfitsio -lCTAConfig -lCTAToolsCore -lprotobuf -lzmq -lCTAUtils
+endif
 
 staticlib: makelibdir makeobjdir $(OBJECTS)	
 		test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)	
