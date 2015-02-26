@@ -25,7 +25,7 @@ SHELL = /bin/sh
 
 SYSTEM= $(shell gcc -dumpmachine)
 # ctatools
-LINKERENV ?= zmq, ctarta, ctatools
+LINKERENV ?= zmq, ctarta
 EXE_NAME1 = rtaebsim
 EXE_NAME2 = rtareceiver
 EXE_NAME3 = controller
